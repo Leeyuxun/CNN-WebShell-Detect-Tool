@@ -1,0 +1,2 @@
+# CNN-WebShell-Detect-Tool
+基于卷积神经网络的WebShell检测工具，可以检测JSP和PHP类型文件，以opcode和bytecode作为检测特征，基于Django框架
