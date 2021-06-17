@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="cn">
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Session success</title>
+        <meta name="keywords" content="Monitor">
+        <meta name="description" content="Monitor">
+        <link rel="shortcut icon" href="{% static "images/favicon.ico" %}" type="image/x-icon"/>
+        <link rel="stylesheet" href="{% static "css/bundle.css" %}" type="text/css">
+        <link rel="stylesheet" href="{% static "css/app.css" %}" type="text/css">
+        <style>
+            .swal-icon--success__hide-corners,.swal-icon--success:after, .swal-icon--success:before{
+                background-color: unset!important;
+                background: unset!important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="text-center p-t-100">
+            <img style="height:100px" src="{% static "images/logo.png" %}" alt="">
+            <div  class="swal-icon swal-icon--success m-t-30 ">
+                <span class="swal-icon--success__line swal-icon--success__line--long"></span>
+                <span class="swal-icon--success__line swal-icon--success__line--tip"></span>
+                <div class="swal-icon--success__ring"></div>
+                <div class="swal-icon--success__hide-corners" ></div>
+            </div>
+            <h3 class="m-t-30">退出成功!!!</h3>
+            <h4 class="text-muted m-t-20" >页面自动 <a id="href" href="{% url 'login' %}">跳转</a> 等待时间： <b id="wait">3</b></h4>
+        </div>
+    </body>
+    <script src="{% static "js/bundle.js" %}"></script>
+    <script src="{% static "js/app.js" %}"></script>
+    <script src="{% static "js/jquery.cookie.min.js" %}"></script>
+    <script src="{% static "js/toast.js" %}"></script>
+    <script src="{% static "js/aman.js" %}"></script>
+    <script type="text/javascript">
+        (function(){
+            // 删除前端cookie里的session
+            let cookie_name = "session_id"
+            document.cookie = cookie_name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            let wait = document.getElementById('wait'),
+                href = document.getElementById('href').href;
+            let interval = setInterval(function(){
+                let time = --wait.innerHTML;
+                if(time <= 0) {
+                    location.href = href;
+                    clearInterval(interval);
+                };
+            }, 1000);
+        })();
+    </script>
+</html>

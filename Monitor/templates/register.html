@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Register</title>
+    <meta name="keywords" content="Monitor">
+    <meta name="description" content="Monitor">
+    <link rel="shortcut icon" href="{% static "images/favicon.ico"%}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static "css/bundle.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/app.css" %}" type="text/css">
+</head>
+<body class="form-membership">
+    <div class="form-wrapper">
+        <!-- logo -->
+        <div id="logo">
+            <img style="width: 50%;" class="logo" src="{% static "images/logo.png" %}" alt="image">
+        </div>
+        <form id="form" >
+            {% csrf_token %}
+            <div class="form-group">
+                {{ registerform.username }}
+                {{ registerform.email }}
+                {{ registerform.passwd }}
+                {{ registerform.repasswd }}
+            </div>
+            <div class="form-row">
+                <div class="form-group col-8 mb-0">
+                    <input autocomplete="off" id="id_captcha_1" name="captcha_1" type="text" placeholder="验证码" required="required" class="form-control" maxlength="4" minlength="4">
+                </div>
+                <div class="form-group col-4 mb-0">
+                    <input id="id_captcha_0" name="captcha_0" type="hidden" value="{{ hashkey }}">
+                    <img src="{{ image_url }}"  class="captcha" style="width: 100%;">
+                </div>
+            </div>
+            <button id="reg" type="submit" class="btn btn-primary btn-block">注册</button>
+        </form>
+        <hr>
+        <p class="text-muted">已有账号？<a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">登录</a></p>
+    </div>
+</body>
+    <script src="{% static "js/bundle.js" %}"></script>
+    <script src="{% static "js/app.js" %}"></script>
+    <script src="{% static "js/jquery.cookie.min.js" %}"></script>
+    <script src="{% static "js/toast.js" %}"></script>
+    <script src="{% static "js/aman.js" %}"></script>
+    <script src="{% static "js/md5.js" %}"></script>
+    <script>
+        /*# 刷新函数 */
+        function vcoderefresh(){
+            console.log('click');
+            $.getJSON("/captcha/refresh/",
+                function(result){
+                    $('.captcha').attr('src', result['image_url']);
+                    $('#id_captcha_0').attr('value', ((result['image_url']).slice(-41,-1)));
+                }
+            );
+        }
+
+        /*# 注册提交表单 */
+        $("#form").submit(function (event) {
+            $("#reg").attr("disabled", "true");
+            let btn = $("#reg");
+            event.preventDefault();
+            event.stopPropagation();
+            if (document.getElementById('form').checkValidity()) {
+                let registerform = new FormData();  // 实例化一个对象
+                registerform.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                registerform.append('username', $('#id_username').val());
+                registerform.append('email', $('#id_email').val());
+                registerform.append('passwd', hex_md5($('#id_passwd').val()));
+                registerform.append('repasswd',hex_md5($('#id_passwd').val()));
+                registerform.append('vcode', $('#id_captcha_1').val());
+                registerform.append('hash_key', $('#id_captcha_0').val());
+                $.ajax({
+                    url: '/register/',
+                    type: 'POST',
+                    data: registerform,
+                    processData: false, // tell jQuery not to process the data
+                    contentType: false, // tell jQuery not to set contentType
+                    success: function (ret) {
+                        if (ret['stcode'] == '0') {
+                            swal(
+                                'ERROR',
+                                ret['message'],
+                                'error'
+                            ).then(vcoderefresh());
+                        } else
+                            swal(
+                                'SUCCESS',
+                                ret['message'],
+                                'success'
+                            ).then(function () {
+                                window.location.href = {% url 'login' %}
+                            });
+                    },
+                });
+                btn.removeAttr("disabled");
+            }
+            else{
+                $("#reg").removeAttr("disabled");
+            }
+        })
+
+        /*# 点击刷新验证码  */
+        $(function(){
+            $('.captcha').css(
+                {
+                    'cursor': 'pointer'
+                }
+            );
+            /*# 刷新*/
+            $('.captcha').click(
+            function(){
+                console.log('click');
+                $.getJSON("/captcha/refresh/",
+                    function(result){
+                        $('.captcha').attr('src', result['image_url']);
+                        $('#id_captcha_0').attr('value', ((result['image_url']).slice(-41,-1)));
+                    }
+                );
+            }
+        );
+        })
+
+    </script>
+</html>

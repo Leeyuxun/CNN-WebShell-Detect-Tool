@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="cn">
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Session Error</title>
+        <meta name="keywords" content="Monitor">
+        <meta name="description" content="Monitor">
+        <link rel="shortcut icon" href="{% static "images/favicon.ico" %}" type="image/x-icon"/>
+        <link rel="stylesheet" href="{% static "css/bundle.css" %}" type="text/css">
+        <link rel="stylesheet" href="{% static "css/app.css" %}" type="text/css">
+    </head>
+    <body>
+        <div class="text-center p-t-100">
+            <img style="height:100px" src="{% static "images/logo.png" %}" alt="">
+            <div class="swal-icon swal-icon--error  m-t-30 ">
+                <div class="swal-icon--error__x-mark">
+                    <span class="swal-icon--error__line swal-icon--error__line--left"></span>
+                    <span class="swal-icon--error__line swal-icon--error__line--right"></span>
+                </div>
+            </div>
+            <h3 class="m-t-30">登录过期，请重新登录!!!</h3>
+            <h4 class="text-muted m-t-20" >页面自动 <a id="href" href="{% url 'login' %}">跳转</a> 等待时间： <b id="wait">3</b></h4>
+        </div>
+    </body>
+    <script src="{% static "js/bundle.js" %}"></script>
+    <script src="{% static "js/app.js" %}"></script>
+    <script src="{% static "js/jquery.cookie.min.js" %}"></script>
+    <script src="{% static "js/toast.js" %}"></script>
+    <script src="{% static "js/aman.js" %}"></script>
+    <script type="text/javascript">
+        (function(){
+            // 删除前端cookie里的session
+            let cookie_name = "session_id"
+            document.cookie = cookie_name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+            let wait = document.getElementById('wait'),
+                href = document.getElementById('href').href;
+            let interval = setInterval(function(){
+                let time = --wait.innerHTML;
+                if(time <= 0) {
+                    location.href = href;
+                    clearInterval(interval);
+                };
+            }, 1000);
+        })();
+    </script>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html >
+<html class="no-js">
+<head>
+    {% load static %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Sensitive File List</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="{% static "images/favicon.ico" %}">
+
+    <link rel="stylesheet" href="{% static "css/layui.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/main.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/layer.css" %}" type="text/css" id="layuicss-layer">
+    <link rel="stylesheet" href="{% static "css/font.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/component.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/default.css" %}" type="text/css">
+
+    <script>(function(e,t,n){var r=e.querySelectorAll("html")[0];r.className=r.className.replace(/(^|\s)no-js(\s|$)/,"$1js$2")})(document,window,0);</script>
+
+
+</head>
+<body class="main_body">
+<div class="layui-layout layui-layout-admin">
+    <!-- 左侧导航 -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-header header">
+            <div class="layui-main">
+                <a href="#"><img style="width:100%" src="{% static "images/logo.png" %}"></a>
+            </div>
+        </div>
+        <div class="user-photo" style="background: #1972AB">
+            <a title="Monitor" class="img"><img src="{% static "images/Monitor.png" %}"></a>
+        </div>
+        <div class="navBar layui-side-scroll" style="height: 494px;">
+            <ul class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item"><a href="{% url 'webshell_detect' %}"><cite>WebShell检测</cite></a></li>
+                <li class="layui-nav-item"><a href="{% url 'webshell_monitor' %}"><cite>WebShell监测</cite></a></li>
+                <li class="layui-nav-item"><a href="{% url 'sensitive_file_monitor' %}"><cite>敏感文件监测</cite></a></li>
+                <li class="layui-nav-item layui-this"><a href=""><cite>敏感文件列表</cite></a></li>
+                <li class="layui-nav-item"><a href="{% url 'local_authority_monitor' %}"><cite>本地权限监测</cite></a></li>
+                <li class="layui-nav-item"><a href="{% url 'user_profile_description' %}"><cite>用户配置文件</cite></a></li>
+                <li class="layui-nav-item"><a href="{% url 'logout' %}"><cite>退出登录</cite></a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- 右侧内容 -->
+    <div class="layui-body layui-form">
+        <div class="layui-tab-content clildFrame">
+            <div class="layui-tab-item layui-show">
+                <div class="childrenBody">
+                    <div class="content">
+                        <div class="layui-inline">
+                        </div>
+                        <form id="pathUploadForm" novalidate>
+                            {% csrf_token %}
+                            <div class="layui-input-inline">
+                                <input type="text" value="" id="pathInput" placeholder="输入敏感文件路径" class="layui-input search_input">
+                            </div>
+                            <button class="layui-btn search_btn" id="pathUpload" type="submit">添加至监测列表</button>
+                        </form>
+                    </div>
+                    <div align="center">
+                        <input class="inputfile inputfile-6" >
+                        <label><strong>敏感文件监测列表</strong></label>
+                    </div>
+                    <div class="layui-form news_list">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="70%">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th align="center">编号</th>
+                                <th>文件路径</th>
+                            </tr>
+                            </thead>
+                            <tbody class="news_content">
+                            {% for sensitive_file_path in sensitive_file_path_list reversed %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <a class="layui-btn layui-btn-normal layui-btn">{{ sensitive_file_path }}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 移动导航 -->
+<div class="site-tree-mobile layui-hide"><i class="layui-icon"></i></div>
+<div class="site-mobile-shade"></div>
+
+
+<script src="{% static "js/leftNav.js" %}"></script>
+<script src="{% static "js/index.js" %}"></script>
+<script src="{% static "js/custom-file-input.js" %}"></script>
+<script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
+<script src="{% static "js/bundle.js" %}"></script>
+
+<script type="text/javascript">
+    $("#pathUploadForm").submit(function (event) {
+        $("#pathUpload").attr("disabled", "true");
+        let btn = $("#pathUpload");
+        event.preventDefault();
+        event.stopPropagation();
+        if (document.getElementById("pathUploadForm").checkValidity()) {
+            let path_upload_form = new FormData();  // 实例化一个对象
+            path_upload_form.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            path_upload_form.append('pathInput', $('#pathInput').val());
+            $.ajax({
+                url: '/sensitive_file_list/',
+                type: 'POST',
+                data: path_upload_form,
+                processData: false, // tell jQuery not to process the data
+                contentType: false, // tell jQuery not to set contentType
+                success: function (ret) {
+                    if (ret['stcode'] == '0') {
+                        swal(
+                            ret['message'],
+                            '',
+                            'error'
+                        ).then(vcoderefresh());
+                    } else {
+                        swal(
+                            ret['message'],
+                            '',
+                            'success',
+                        ).then(function () {
+                            window.location.href =
+                            {% url 'sensitive_file_list' %}
+                        });
+                    }
+
+                },
+            });
+            btn.removeAttr("disabled");
+        } else {
+            $("#reg").removeAttr("disabled");
+        }
+    })
+    </script>
+
+<script type="text/javascript">
+    $(function (ret) {
+        swal(
+            'ERROR',
+            ret['message'],
+            'error'
+        ).then(function () {
+            window.location.href = {% url 'login' %}
+        });
+    });
+</script>
+
+<div class="layui-layer-move"></div>
+</body>
+</html>

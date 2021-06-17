@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/gp/Desktop/Monitor/MonitorPlatform/webshell_detect/webshell_detect_cnn_model/php_cnn_model/php-webshell-detect-cnn-model"
+all_model_checkpoint_paths: "/home/gp/Desktop/Monitor/MonitorPlatform/webshell_detect/webshell_detect_cnn_model/php_cnn_model/php-webshell-detect-cnn-model"

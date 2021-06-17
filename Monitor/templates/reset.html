@@ -1,0 +1,90 @@
+
+<!doctype html>
+<html lang="cn">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ResetPassword</title>
+    <meta name="keywords" content="Monitor">
+    <meta name="description" content="Monitor">
+    <link rel="shortcut icon" href="{% static "images/favicon.ico"%}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static "css/bundle.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/app.css" %}" type="text/css">
+</head>
+<body class="form-membership">
+    <div class="form-wrapper">
+        <!-- logo -->
+        <div id="logo">
+            <img style="width: 50%;" class="logo" src="{% static "images/logo.png" %}" alt="image">
+        </div>
+        <!-- form -->
+        <!-- form -->
+        <form id="form" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                {{ resetform.email }}
+            </div>
+            <div class="form-row">
+                <div class="form-group col-8 mb-0">
+                    <input autocomplete="off" id="id_captcha_1" name="captcha_1" type="text" placeholder="验证码" required="True" class="form-control">
+                </div>
+                <div class="form-group col-4 mb-0">
+                    <input id="id_captcha_0" name="captcha_0" type="hidden" value="{{ hashkey }}">
+                    <img src="{{ image_url }}" alt="captcha" class="captcha" style="width: 100%;">
+                </div>
+            </div>
+            <button id="login" type="submit" class="btn btn-primary btn-block">重置密码</button>
+            <hr>
+            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light ml-1">返回登录</a>
+        </form>
+</div>
+</body>
+<script src="{% static "js/bundle.js" %}"></script>
+<script src="{% static "js/app.js" %}"></script>
+<script src="{% static "js/jquery.cookie.min.js" %}"></script>
+<script src="{% static "js/toast.js" %}"></script>
+<script src="{% static "js/aman.js" %}"></script>
+<script>
+    $("#form").submit(function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        let form=document.getElementById('form');
+        if(form.checkValidity()){
+            let data = $("#form").serialize();
+            Ajax("/reset.html", 'post', data, function (res) {
+                swal('重置成功', res.msg, "success").then(willDelete=>{
+                    location.reload();
+                });
+            },function (res) {
+                $("#vcode").click()
+            });
+
+        }
+        return false;
+    })
+
+    /*# 点击刷新验证码  */
+    $(function(){
+        $('.captcha').css(
+            {
+                'cursor': 'pointer'
+            }
+        );
+        /*# ajax 刷新*/
+        $('.captcha').click(
+            function(){
+                console.log('click');
+                $.getJSON("/captcha/refresh/",
+                    function(result){
+                        $('.captcha').attr('src', result['image_url']);
+                        $('#id_captcha_0').attr('value', ((result['image_url']).slice(-41,-1)));
+                    }
+                );
+            }
+        );
+    })
+
+</script>
+</html>

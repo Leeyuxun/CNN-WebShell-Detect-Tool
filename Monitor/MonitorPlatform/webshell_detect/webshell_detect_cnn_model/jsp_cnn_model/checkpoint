@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/gp/Desktop/Monitor/MonitorPlatform/webshell_detect/webshell_detect_cnn_model/jsp_cnn_model/jsp-webshell-detect-cnn-model"
+all_model_checkpoint_paths: "/home/gp/Desktop/Monitor/MonitorPlatform/webshell_detect/webshell_detect_cnn_model/jsp_cnn_model/jsp-webshell-detect-cnn-model"
